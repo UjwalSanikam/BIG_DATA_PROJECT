@@ -1,0 +1,4 @@
+import {steps,nodes,byId,commandFor} from './plan.mjs';
+const escape=v=>String(v).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function render(){const node=Number(document.querySelector('#node').value);document.querySelector('#guide').innerHTML=steps.filter(s=>s.node===node).map((s,i)=>`<details class="panel" ${i===0?'open':''}><summary>${s.stage} · ${i+1}. ${escape(s.title)}</summary><p>${escape(s.why)}</p>${s.deps.length?`<div class="callout"><strong>Before you start</strong>${s.deps.map(id=>`Node ${byId[id].node}: ${escape(byId[id].title)}`).join('<br>')}</div>`:''}<div class="command"><div class="command-header">BASH · NODE ${node}</div><pre>${escape(commandFor(s,{},location.origin))}</pre></div><div class="expected"><strong>Expected output</strong><p>${escape(s.expected)}</p></div><p>${escape(s.help)}</p></details>`).join('');}
+document.querySelector('#node').addEventListener('change',render);render();

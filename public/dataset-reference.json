@@ -1,0 +1,227 @@
+{
+  "kind": "Local reference computation; not distributed execution evidence",
+  "phases": [
+    {
+      "phase": 0,
+      "sha256": "245b1fdebac792d607578196c9eed86cf91ad4642832be623a12c0f19115bde9",
+      "lines": 1040,
+      "rejected": 20,
+      "accepted_unique": 1000,
+      "duplicates": 20,
+      "changed_first_run": 1000,
+      "active_documents": 1000,
+      "valid_edges": 499,
+      "postings": 453471,
+      "unique_terms": 72569,
+      "avgdl": 1453.92,
+      "rank_mass_after_10_iterations": 0.9999999999999999,
+      "queries": {
+        "beard": [
+          {
+            "doc_id": "94",
+            "title": "Beard",
+            "url": "https://simple.wikipedia.org/wiki/Beard",
+            "length": 125,
+            "bm25": 10.645352431561847,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 1.0
+          },
+          {
+            "doc_id": "500",
+            "title": "Mustache",
+            "url": "https://simple.wikipedia.org/wiki/Mustache",
+            "length": 310,
+            "bm25": 10.42337360837945,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.9854034728087551
+          },
+          {
+            "doc_id": "318",
+            "title": "Goatee",
+            "url": "https://simple.wikipedia.org/wiki/Goatee",
+            "length": 58,
+            "bm25": 9.802474686795145,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.9445753980312208
+          },
+          {
+            "doc_id": "359",
+            "title": "Hair",
+            "url": "https://simple.wikipedia.org/wiki/Hair",
+            "length": 1545,
+            "bm25": 8.712318916022403,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.8728906844957236
+          },
+          {
+            "doc_id": "2964",
+            "title": "Russia",
+            "url": "https://simple.wikipedia.org/wiki/Russia",
+            "length": 12433,
+            "bm25": 3.1234750438609553,
+            "pagerank": 0.0002635957433937349,
+            "final_score": 0.2505318037045702
+          }
+        ],
+        "april": [
+          {
+            "doc_id": "428",
+            "title": "L. L. Zamenhof",
+            "url": "https://simple.wikipedia.org/wiki/L._L._Zamenhof",
+            "length": 1257,
+            "bm25": 2.936922220980037,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.9311306500799228
+          },
+          {
+            "doc_id": "927",
+            "title": "Microsoft Windows",
+            "url": "https://simple.wikipedia.org/wiki/Microsoft_Windows",
+            "length": 1763,
+            "bm25": 2.919467613638607,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.9273797377814657
+          },
+          {
+            "doc_id": "468",
+            "title": "March",
+            "url": "https://simple.wikipedia.org/wiki/March",
+            "length": 2876,
+            "bm25": 2.863273853810323,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.9153039654244348
+          },
+          {
+            "doc_id": "153",
+            "title": "Time Cube",
+            "url": "https://simple.wikipedia.org/wiki/Time_Cube",
+            "length": 489,
+            "bm25": 2.8580917610468823,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.914190358277742
+          },
+          {
+            "doc_id": "479",
+            "title": "Money",
+            "url": "https://simple.wikipedia.org/wiki/Money",
+            "length": 1383,
+            "bm25": 2.757424502424972,
+            "pagerank": 0.0017517249423117263,
+            "final_score": 0.8925574420493343
+          }
+        ]
+      }
+    },
+    {
+      "phase": 1,
+      "sha256": "75c840fa497aaf14b7b7350071edcffd66cc6b2b9d1a31b12da8d60a943e66e5",
+      "lines": 100,
+      "rejected": 0,
+      "accepted_unique": 100,
+      "duplicates": 0,
+      "changed_first_run": 100,
+      "active_documents": 975,
+      "valid_edges": 467,
+      "postings": 428080,
+      "unique_terms": 69963,
+      "avgdl": 1413.2666666666667,
+      "rank_mass_after_10_iterations": 0.9999999999999999,
+      "queries": {
+        "beard": [
+          {
+            "doc_id": "318",
+            "title": "Goatee",
+            "url": "https://simple.wikipedia.org/wiki/Goatee",
+            "length": 58,
+            "bm25": 9.750522331594803,
+            "pagerank": 0.0021948566550351388,
+            "final_score": 0.94524393074785
+          },
+          {
+            "doc_id": "500",
+            "title": "Mustache",
+            "url": "https://simple.wikipedia.org/wiki/Mustache",
+            "length": 310,
+            "bm25": 10.362299321021906,
+            "pagerank": 0.0018519574701437317,
+            "final_score": 0.9388599154945465
+          },
+          {
+            "doc_id": "359",
+            "title": "Hair",
+            "url": "https://simple.wikipedia.org/wiki/Hair",
+            "length": 1545,
+            "bm25": 8.624835317138313,
+            "pagerank": 0.0018519574701437317,
+            "final_score": 0.8238826798888125
+          },
+          {
+            "doc_id": "94",
+            "title": "Beard (Phase 1)",
+            "url": "https://simple.wikipedia.org/wiki/Beard",
+            "length": 134,
+            "bm25": 10.577961770528605,
+            "pagerank": 0.00027880890076658943,
+            "final_score": 0.7381084887881381
+          },
+          {
+            "doc_id": "2964",
+            "title": "Russia",
+            "url": "https://simple.wikipedia.org/wiki/Russia",
+            "length": 12433,
+            "bm25": 3.046950585441422,
+            "pagerank": 0.00027880890076658943,
+            "final_score": 0.23974141733127186
+          }
+        ],
+        "april": [
+          {
+            "doc_id": "153",
+            "title": "Time Cube",
+            "url": "https://simple.wikipedia.org/wiki/Time_Cube",
+            "length": 489,
+            "bm25": 2.9273059956472967,
+            "pagerank": 0.0024179945276845793,
+            "final_score": 0.8141156669036073
+          },
+          {
+            "doc_id": "185",
+            "title": "December",
+            "url": "https://simple.wikipedia.org/wiki/December",
+            "length": 2171,
+            "bm25": 2.375521006885796,
+            "pagerank": 0.003915339905771621,
+            "final_score": 0.8103101866537674
+          },
+          {
+            "doc_id": "186",
+            "title": "Dublin",
+            "url": "https://simple.wikipedia.org/wiki/Dublin",
+            "length": 1197,
+            "bm25": 2.4922596243014548,
+            "pagerank": 0.0034460478196615806,
+            "final_score": 0.7994300565142176
+          },
+          {
+            "doc_id": "428",
+            "title": "L. L. Zamenhof",
+            "url": "https://simple.wikipedia.org/wiki/L._L._Zamenhof",
+            "length": 1257,
+            "bm25": 3.007057646942263,
+            "pagerank": 0.0018519574701437317,
+            "final_score": 0.7878772206212755
+          },
+          {
+            "doc_id": "927",
+            "title": "Microsoft Windows",
+            "url": "https://simple.wikipedia.org/wiki/Microsoft_Windows",
+            "length": 1763,
+            "bm25": 2.988254392318841,
+            "pagerank": 0.0018519574701437317,
+            "final_score": 0.7838378994160481
+          }
+        ]
+      }
+    }
+  ]
+}

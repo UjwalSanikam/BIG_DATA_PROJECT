@@ -1,0 +1,8 @@
+.env*
+.local/
+node_modules/
+.vercel/
+dist/
+__pycache__/
+public/vm-kit.tar.gz
+public/database.sql
