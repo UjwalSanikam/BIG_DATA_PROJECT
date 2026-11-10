@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {steps,byId,blockers,cascade,commandFor} from '../public/plan.mjs';
+import {steps,byId,blockers,cascade,commandFor} from '../lib/plan.mjs';
 import {hash,mutate,sanitize,configure} from '../lib/domain.mjs';
 const config={ip1:'10.1.1.1',ip2:'10.1.1.2',ip3:'10.1.1.3',ip4:'10.1.1.4',network:'aabbccddeeff0011',user:'ubuntu'};
 const key='0123456789abcdef0123456789abcdef';

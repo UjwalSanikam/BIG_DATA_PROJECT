@@ -7,6 +7,8 @@ A Vercel-ready website for a four-person distributed search engine project. Each
 - 54 ordered checkpoints across setup, cluster startup, Phase 0, Phase 1 and resilience.
 - Four VM workspaces, team overview, pipeline map, activity history, glossary and evidence report export.
 - Server-enforced ownership and dependency checks; concurrent updates use database compare-and-swap.
+- Locked steps hide instructions, expected output and action controls behind a red prerequisite screen. The API only returns instructions for unlocked steps.
+- The room owner can preview one locked step using their existing `LAB_CREATE_KEY` password and owner recovery credentials. Preview is read-only, ends when navigating away or refreshing, and never marks prerequisites complete. Teammates cannot preview even if they know the password.
 - Shared screenshots (PNG/JPEG/WebP, at most 1 MB each, three per step) and terminal notes.
 - Reopen a step and invalidate completed dependents across the team; evidence remains available.
 - Private invitation links and per-seat recovery keys; room-owner configuration and seat recovery.
@@ -25,6 +27,8 @@ node scripts/dev.mjs
 ```
 
 Open http://127.0.0.1:4173. The local server persists room state and screenshots under `.local/`. This is a real server-backed preview, but it binds only to this computer. It is not the production hosting solution.
+
+To test owner preview locally, set `LAB_CREATE_KEY` in the local server environment. Full step definitions live in `lib/plan.mjs`; builds generate `public/plan.mjs` with navigation metadata only. The public VM guide shows the outline, while command instructions are gated inside the workspace. The downloadable VM toolkit and public repository remain project source materials, not confidential content.
 
 ## Deploy to Vercel with durable shared storage
 

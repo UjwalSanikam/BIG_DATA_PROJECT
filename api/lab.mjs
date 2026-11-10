@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {store} from '../lib/store.mjs';
-import {hash,secret,fail,mutate,sanitize} from '../lib/domain.mjs';
+import {hash,secret,fail,mutate,sanitize,previewStep} from '../lib/domain.mjs';
 const uuid=/^[a-f0-9-]{36}$/;
 async function body(req){if(req.body)return typeof req.body==='string'?JSON.parse(req.body):req.body;let text='';for await(const chunk of req){text+=chunk;if(text.length>1550000)fail('Upload is too large. Use a screenshot under 1 MB.',413);}return text?JSON.parse(text):{};}
 export default async function handler(req,res){
@@ -25,6 +25,7 @@ export default async function handler(req,res){
    res.setHeader('Content-Type',image.mime);res.end(Buffer.from(image.data,'base64'));return;
   }
   const token=req.headers['x-member-key']||'';
+  if(action==='preview')return send(200,{step:previewStep(row.state,b.step,token,b.password)});
   if(action==='evidence'){
    // Authorize the seat and step before storing anything.
    mutate(row.state,'note',{...b,note:''},token);

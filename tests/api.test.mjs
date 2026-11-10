@@ -24,4 +24,24 @@ test('shared room auth, concurrent updates, evidence and persistence',async()=>{
  assert.equal((await request('evidence',{node:1,step:'n1-check',name:'bad.png',mime:'image/png',data:Buffer.from('not really an image at all').toString('base64')},keys[0])).status,400);
  const replay=await request('complete',{node:1,step:'n1-check',confirm:true},keys[0]);assert.equal(Object.keys(replay.data.state.done).length,4);
  assert.equal((await request('claim',{node:1,name:'Steal',key:'x'.repeat(30)})).status,409);
+ // Locked instructions are withheld, not merely disabled in the UI.
+ current=(await request('state')).data;
+ assert.ok(current.state.stepContents['n1-check'].command);
+ assert.ok(!current.state.stepContents['n1-install']);
+ process.env.LAB_CREATE_KEY='test-owner-preview-password';
+ const beforePreview=JSON.stringify(current);
+ assert.equal((await request('preview',{step:'n1-install',password:process.env.LAB_CREATE_KEY},keys[0])).status,403);
+ assert.equal((await request('preview',{step:'n1-install',password:'wrong'},room.owner)).status,403);
+ assert.equal((await request('preview',{step:'n1-install'},room.owner)).status,403);
+ const preview=await request('preview',{step:'n1-install',password:process.env.LAB_CREATE_KEY},room.owner);
+ assert.equal(preview.status,200);assert.ok(preview.data.step.command);assert.ok(preview.data.step.expected);
+ assert.equal(JSON.stringify((await request('state')).data),beforePreview);
+ assert.equal((await request('complete',{node:1,step:'n1-install',confirm:true,note:'previewed'},keys[0])).status,409);
+ assert.equal((await request('preview',null,room.owner)).status,405);
+ assert.equal((await request('preview',{step:'unknown',password:process.env.LAB_CREATE_KEY},room.owner)).status,404);
+ // Reopening an earlier checkpoint removes instructions from later responses.
+ assert.ok(current.state.stepContents['n1-network']);
+ await request('undo',{node:1,step:'n1-check',confirm:true},keys[0]);
+ assert.ok(!(await request('state')).data.state.stepContents['n1-network']);
+ delete process.env.LAB_CREATE_KEY;
 });
