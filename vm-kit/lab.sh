@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+[[ -r "$HOME/.searchlab-profile" ]] || { echo 'SETUP_INCOMPLETE: finish Step 5 successfully before running lab.sh. The profile does not exist yet.'; exit 1; }
+python3 "$HOME/searchlab/preflight.py" "$HOME/searchlab.env"
 source "$HOME/.searchlab-profile"
 cd "$LAB_ROOT"
 ACTION="${1:?Choose an action}"; PHASE="${2:-0}"
@@ -22,8 +24,14 @@ submit(){
 }
 case "$ACTION" in
 doctor)
-  if [[ "$NODE" != 4 ]]; then java -version; hdfs version; "$SPARK_HOME/bin/spark-submit" --version; fi
-  "$LAB_ROOT/venv/bin/python" -c 'import fastapi,pyarrow; print("Python environment OK")'
+  "$LAB_ROOT/venv/bin/python" -c 'import sys,platform,fastapi,uvicorn,pyarrow; assert sys.version_info[:2] == (3,11), "Rerun the updated Step 5 to install project Python 3.11"; assert pyarrow.__version__ == "18.1.0"; print("PROJECT_PYTHON_OK", platform.python_version()); print("Python environment OK; PyArrow", pyarrow.__version__)'
+  [[ "$(/opt/searchlab-python/bin/python -c 'import sys; print(sys.version_info[:2])')" == '(3, 11)' ]] || exit 1
+  if [[ "$NODE" != 4 ]]; then
+    JAVA_VERSION="$(java -version 2>&1)"; printf '%s\n' "$JAVA_VERSION"; [[ "$JAVA_VERSION" == *'version "11.'* ]] || exit 1
+    HADOOP_VERSION="$(hdfs version)"; printf '%s\n' "$HADOOP_VERSION"; [[ "$HADOOP_VERSION" == *'Hadoop 3.3.6'* ]] || exit 1
+    SPARK_VERSION="$("$SPARK_HOME/bin/spark-submit" --version 2>&1)"; printf '%s\n' "$SPARK_VERSION"; [[ "$SPARK_VERSION" == *'version 3.5.3'* ]] || exit 1
+  fi
+  echo "LOCAL_USER=$(id -un) · HDFS_USER=$HADOOP_USER_NAME"
   echo DOCTOR_OK;;
 storage-start)
   role 2
@@ -65,7 +73,12 @@ transfer)
   TMP="$(mktemp -d "$LAB_ROOT/transfer.XXXXXX")"
   hdfs dfs -get "$REMOTE" "$TMP/export"
   "$LAB_ROOT/venv/bin/python" serving.py package "$TMP/export" "$TMP/phase$PHASE.tar.gz"
-  scp "$TMP/phase$PHASE.tar.gz" "$LAB_USER@$N4:searchlab/incoming/phase$PHASE.tar.gz"
+  TARGET_USER="${N4_USER:-}"
+  if [[ -z "$TARGET_USER" ]]; then
+    read -r -p 'Node 4 Linux username (ask its owner to run whoami): ' TARGET_USER
+  fi
+  [[ "$TARGET_USER" =~ ^[a-z_][a-z0-9_-]{0,30}$ ]] || { echo 'Enter a valid Node 4 username.'; exit 1; }
+  scp "$TMP/phase$PHASE.tar.gz" "$TARGET_USER@$N4:searchlab/incoming/phase$PHASE.tar.gz"
   echo "TRANSFER_OK $TMP/phase$PHASE.tar.gz";;
 serve) role 4; exec "$LAB_ROOT/venv/bin/uvicorn" search:app --host "$N4" --port 8000;;
 activate) role 4; phase; "$LAB_ROOT/venv/bin/python" serving.py activate "incoming/phase$PHASE.tar.gz";;

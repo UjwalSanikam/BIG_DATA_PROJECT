@@ -1,6 +1,6 @@
 # SearchLab VM kit
 
-Run the commands in the shared dashboard in order. This kit is for four x86_64 Ubuntu 22.04/24.04 VMs, on a private ZeroTier network, with the same Linux username on every VM. Recommended: 4 GB RAM and 20 GB free disk each; 8 GB RAM on Nodes 2 and 3. The classroom cluster has no Kerberos authentication: restrict access to your private team network.
+Run the commands in the shared dashboard in order. This kit is for four x86_64 Ubuntu 22.04/24.04 VMs, on a private ZeroTier network, with a separate local Linux username allowed on each VM. Recommended: 4 GB RAM and 20 GB free disk each; 8 GB RAM on Nodes 2 and 3. The classroom cluster has no Kerberos authentication: restrict access to your private team network.
 
 ## Roles
 
@@ -15,7 +15,7 @@ Run the commands in the shared dashboard in order. This kit is for four x86_64 U
 
 1. Download this archive from the dashboard. Transfer to each VM, then extract into `~/searchlab`.
 2. Configure your ZeroTier network and authorize all four VMs.
-3. Save the four IPs and Linux username in the dashboard's Team settings.
+3. Save the four IPs in the dashboard's Team settings.
 4. Run the generated configuration block to write `~/searchlab.env` on each VM.
 5. Run `bash setup.sh`, then follow that node's dashboard steps.
 
@@ -49,10 +49,20 @@ Required UPSERT fields: `doc_id`, `title`, `url`, `text`. Optional `links` is a 
 
 ## Troubleshooting
 
-`ACCESS_DENIED` in ZeroTier: the network owner must authorize the VM. `Connection refused`: check the target daemon, private IP and firewall. `ModuleNotFoundError: records`: use lab.sh, which ships records.py to Spark workers. `Python worker failed`: verify the identical virtualenv path and Python minor version on Nodes 1–3 (use the same Ubuntu release across those nodes if possible). A mixed Python 3.10/3.12 cluster is not supported by PySpark: align those VMs before submitting jobs. `Incompatible clusterIDs`: do not reformat the NameNode; recover the original metadata and inspect the DataNode directories with your instructor.
+`ACCESS_DENIED` in ZeroTier: the network owner must authorize the VM. `Connection refused`: check the target daemon, private IP and firewall. `ModuleNotFoundError: records`: use lab.sh, which ships records.py to Spark workers. `Python worker failed`: rerun the updated Step 5 on all nodes and verify `/opt/searchlab-python/bin/python --version` reports 3.11.18 on each. The shared symlink avoids differing home-directory paths; system Python versions may differ. `Incompatible clusterIDs`: do not reformat the NameNode; recover the original metadata and inspect the DataNode directories with your instructor.
 
 Never format a populated NameNode, expire required snapshots, or overwrite the active serving folder. The setup script only initializes an empty local NameNode directory. It does not configure a cloud firewall, create VMs, or join ZeroTier automatically.
 
 ## Verification scope
 
 The dashboard/backend and pure normalization/ranking/serving contracts are tested locally. The four-VM HDFS/Spark/Iceberg integration still must be executed and verified on your actual VMs. Runtime downloads, private-network reachability and available memory depend on those machines. Follow each checkpoint and save actual output.
+
+## Installer 1.1 recovery
+
+Refresh the VM kit before retrying Step 5. The installer uses pinned Python 3.11.18 from Astral’s python-build-standalone release and Temurin Java 11.0.33+10 directly from its official GitHub release, verified against SHA-256 digests. It no longer calls the Adoptium discovery API. Hadoop/Spark use pinned Apache SHA-512 digests. Interrupted downloads retry; an incomplete installation never counts as complete.
+
+PyArrow installs from binary wheels only; it will not attempt a C++ build. Incompatible `venv` directories are renamed to `venv.previous-*`, not deleted. Dataset, HDFS storage and serving directories are preserved. `/usr/bin/python3` is never changed.
+
+All Spark nodes use `/opt/searchlab-python/bin/python`, a symlink to that VM’s project virtualenv. Each node exports the shared HDFS application identity `searchlab`; the Linux accounts can differ. Apply this installer to all nodes before starting the cluster. If updating an already-running cluster, stop its daemons and check existing HDFS ownership before changing its application identity. Node 3 asks for Node 4’s actual SSH username during transfer.
+
+Run setup as your normal user, not `sudo bash setup.sh`. Do not edit the script to insert your username or replace NODE with a username. `searchlab.env` accepts numeric NODE and four distinct private IPv4 addresses. Step 5 stops on the first failure and saves setup.log and doctor.log. Mark done only after DOCTOR_OK.

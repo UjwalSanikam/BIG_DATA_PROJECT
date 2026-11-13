@@ -19,14 +19,14 @@
 ## First session together
 
 - Open **Team settings** and save the ZeroTier network ID. The four IP fields can stay empty until the devices join.
-- Confirm your Ubuntu setup in each node's workspace. Nodes 1–3 need the same Python minor version, so choose the same Ubuntu release there. Use the same Linux username on all four VMs.
+- Confirm your Ubuntu setup in each node's workspace. Step 5 installs identical project Python 3.11.18 on all four VMs. System Python and Linux usernames may differ.
 - Join and authorize all four ZeroTier devices. Add their four private IPs in Team settings. Confirm connectivity before installing and starting cluster services.
 - Use **Download VM kit** and follow just your own active command. Compare actual output with **What success looks like**. Save a screenshot or terminal output for evidence checkpoints.
 - A red screen identifies a dependency. Wait for that specific teammate to finish, then your screen unlocks automatically. The site records human confirmations; it does not run commands on your behalf.
 
 ## Dataset handoff to the Node 1 operator
 
-Use the supplied `Node1-dataset.zip` from the delivery if available. It contains `data/pages.jsonl` and `data/changes.jsonl`. Download the VM kit first. In a terminal on your **laptop**, replace USER and NODE1_IP with the configured Linux username and actual ZeroTier IP:
+Use the supplied `Node1-dataset.zip` from the delivery if available. It contains `data/pages.jsonl` and `data/changes.jsonl`. Download the VM kit first. In a terminal on your **laptop**, replace USER and NODE1_IP with the Node 1’s actual Linux username from whoami and actual ZeroTier IP:
 
 ```bash
 scp Node1-dataset.zip USER@NODE1_IP:searchlab/Node1-dataset.zip

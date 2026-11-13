@@ -1,17 +1,35 @@
 #!/usr/bin/env bash
-set -euo pipefail
-source "$HOME/searchlab.env"
+set -Eeuo pipefail
+STAGE='configuration checks'
+trap 'code=$?; printf "\nSETUP_FAILED during %s (line %s, exit %s). Stop here; do not mark Step 5 done.\n" "$STAGE" "$LINENO" "$code" >&2; exit "$code"' ERR
+[[ "$EUID" != 0 ]] || { echo 'Run bash setup.sh as your normal VM user, without sudo.'; exit 1; }
 [[ "$(uname -m)" == x86_64 ]] || { echo 'This kit requires x86_64 Ubuntu.'; exit 1; }
-[[ "$NODE" =~ ^[1-4]$ ]] || exit 1
-[[ "$(id -un)" == "$LAB_USER" ]] || { echo 'Use the same configured Linux username on all four VMs.'; exit 1; }
 ROOT="$HOME/searchlab"
 cd "$ROOT"
+python3 preflight.py "$HOME/searchlab.env"
+source "$HOME/searchlab.env"
+echo "Installing for Node $NODE as local user $(id -un). Different VM usernames are supported."
+STAGE='Ubuntu packages'
 sudo apt-get update
-sudo apt-get install -y curl python3 python3-venv openssh-server iputils-ping
+sudo apt-get install -y ca-certificates curl python3 openssh-server iputils-ping tar
 sudo systemctl enable --now ssh
-python3 -m venv "$ROOT/venv"
-"$ROOT/venv/bin/pip" install 'fastapi==0.115.6' 'uvicorn==0.34.0' 'pyarrow==18.1.0'
+STAGE='isolated Python 3.11.18'
+python3 prepare_python.py
+STAGE='Python binary packages'
+"$ROOT/venv/bin/python" -m pip install --only-binary=:all: --retries 3 --timeout 60 -r requirements.txt
+# Spark sends this identical interpreter path to both worker hosts, even when
+# their home directories/usernames differ. Do not replace an unrelated path.
+if [[ -e /opt/searchlab-python || -L /opt/searchlab-python ]]; then
+  [[ -L /opt/searchlab-python && "$(readlink /opt/searchlab-python)" == "$ROOT/venv" ]] || { echo '/opt/searchlab-python already belongs to another installation. Stop and check its owner before changing it.'; exit 1; }
+else
+  sudo ln -s "$ROOT/venv" /opt/searchlab-python
+fi
 mkdir -p data incoming serving runtime
+if [[ "$NODE" != 4 ]]; then
+  STAGE='Java, Hadoop and Spark downloads'
+  "$ROOT/venv/bin/python" download_runtime.py
+fi
+STAGE='local service configuration'
 cat > "$HOME/.searchlab-profile" <<EOF
 source "\$HOME/searchlab.env"
 export LAB_ROOT="\$HOME/searchlab"
@@ -19,13 +37,12 @@ export JAVA_HOME="\$LAB_ROOT/runtime/java"
 export HADOOP_HOME="\$LAB_ROOT/runtime/hadoop"
 export HADOOP_CONF_DIR="\$HADOOP_HOME/etc/hadoop"
 export SPARK_HOME="\$LAB_ROOT/runtime/spark"
-export PYSPARK_PYTHON="\$LAB_ROOT/venv/bin/python"
+export PYSPARK_PYTHON="/opt/searchlab-python/bin/python"
 export PYSPARK_DRIVER_PYTHON="\$LAB_ROOT/venv/bin/python"
 export PATH="\$JAVA_HOME/bin:\$HADOOP_HOME/bin:\$SPARK_HOME/bin:\$PATH"
-export HADOOP_USER_NAME="$LAB_USER"
+export HADOOP_USER_NAME="searchlab"
 EOF
 if [[ "$NODE" != 4 ]]; then
-  python3 download_runtime.py
   source "$HOME/.searchlab-profile"
   mkdir -p "$ROOT/storage/name" "$ROOT/storage/data"
   cat > "$HADOOP_CONF_DIR/core-site.xml" <<EOF
@@ -52,8 +69,8 @@ export SPARK_MASTER_HOST="$N3"
 export SPARK_WORKER_HOST="$MY_IP"
 export SPARK_WORKER_CORES=2
 export SPARK_WORKER_MEMORY=2g
-export PYSPARK_PYTHON="$ROOT/venv/bin/python"
+export PYSPARK_PYTHON="/opt/searchlab-python/bin/python"
 export PYSPARK_DRIVER_PYTHON="$ROOT/venv/bin/python"
 EOF
 fi
-echo SETUP_OK
+echo 'SETUP_OK · installer 1.1 · project Python 3.11.18'
